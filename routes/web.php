@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsersController; // 追記
 
 /*
 |--------------------------------------------------------------------------
@@ -18,14 +19,18 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
+// 同じビューに対してログイン有無で見た目変わるのはビューでif分岐すればいいだけ
+// 同じビューに対してログイン有無でURL入力可否を分けるのは良くないというか意味がわからない
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    Route::resource('users', UsersController::class, ['only' => ['index', 'show']]);     // 追記この中にまとめた方が効率的
 });
 
 require __DIR__.'/auth.php';
