@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController; // 追記
+use App\Http\Controllers\MicropostsController; //追記
 
 /*
 |--------------------------------------------------------------------------
@@ -15,15 +16,11 @@ use App\Http\Controllers\UsersController; // 追記
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+Route::get('/', [MicropostsController::class, 'index']);
 
-// 同じビューに対してログイン有無で見た目変わるのはビューでif分岐すればいいだけ
-// 同じビューに対してログイン有無でURL入力可否を分けるのは良くないというか意味がわからない
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [MicropostsController::class, 'index'])->middleware(['auth'])->name('dashboard');
+
+require __DIR__.'/auth.php';
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,6 +28,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     Route::resource('users', UsersController::class, ['only' => ['index', 'show']]);     // 追記この中にまとめた方が効率的
+    Route::resource('microposts', MicropostsController::class, ['only' => ['store', 'destroy']]);
 });
 
-require __DIR__.'/auth.php';
