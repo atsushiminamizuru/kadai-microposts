@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('users', UsersController::class, ['only' => ['index', 'show']]);     // 追記この中にまとめた方が効率的
-    Route::resource('microposts', MicropostsController::class, ['only' => ['store', 'destroy']]);
+    Route::resource('microposts', MicropostsController::class, ['only' => ['store', 'destroy', 'edit', 'update']]);
 
     Route::group(['prefix' => 'users/{id}'], function () {                                          // 追記
         Route::post('follow', [UserFollowController::class, 'store'])->name('user.follow');         // 追記

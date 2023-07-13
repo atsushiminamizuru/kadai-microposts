@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;                        // 追加
 
+use App\Models\Micropost;
+
 class MicropostsController extends Controller
 {
     public function index()
@@ -22,32 +24,32 @@ class MicropostsController extends Controller
                 'microposts' => $microposts,
             ];
         }
-        
+
         // dashboardビューでそれらを表示
         return view('dashboard', $data);
     }
-    
+
     public function store(Request $request)
     {
         // バリデーション
         $request->validate([
             'content' => 'required|max:255',
         ]);
-        
+
         // 認証済みユーザ（閲覧者）の投稿として作成（リクエストされた値をもとに作成）
         $request->user()->microposts()->create([
             'content' => $request->content,
         ]);
-        
+
         // 前のURLへリダイレクトさせる
         return back();
     }
-    
+
     public function destroy($id)
     {
         // idの値で投稿を検索して取得
-        $micropost = \App\Models\Micropost::findOrFail($id);
-        
+        $micropost = Micropost::findOrFail($id);
+
         // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は投稿を削除
         if (Auth::id() === $micropost->user_id) {
             $micropost->delete();
@@ -55,6 +57,39 @@ class MicropostsController extends Controller
                 ->with('success','Delete Successful');
         }
 
+        // 前のURLへリダイレクトさせる
+        return back()
+            ->with('Delete Failed');
+    }
+
+    public function edit($id)
+    {
+        // idの値でメッセージを検索して取得
+        $micropost = Micropost::findOrFail($id);
+
+        // メッセージ編集ビューでそれを表示
+        return view('microposts.edit', [
+            'micropost' => $micropost,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // バリデーション
+        $request->validate([
+            'content' => 'required|max:255',
+        ]);
+        
+        // idの値で投稿を検索して取得
+        $micropost = Micropost::findOrFail($id);
+
+        // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は投稿を削除
+        if (Auth::id() === $micropost->user_id) {
+            $micropost->content = $request->content;
+            $micropost->save();
+            return redirect('/');
+        }
+        
         // 前のURLへリダイレクトさせる
         return back()
             ->with('Delete Failed');

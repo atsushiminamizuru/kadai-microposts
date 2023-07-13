@@ -24,17 +24,21 @@
                                 {{-- お気に入り／お気に入り解除ボタン --}}
                                 @include('user_favorites.favorite_button')
                             </div>
+                            @if (Auth::id() == $micropost->user_id)
+                            {{-- 投稿削除ボタンのフォーム --}}
                             <div>
-                                @if (Auth::id() == $micropost->user_id)
-                                    {{-- 投稿削除ボタンのフォーム --}}
-                                    <form method="POST" action="{{ route('microposts.destroy', $micropost->id) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-error btn-sm normal-case" 
-                                            onclick="return confirm('Delete id = {{ $micropost->id }} ?')">Delete</button>
-                                    </form>
-                                @endif
+                                <form method="POST" action="{{ route('microposts.destroy', $micropost->id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-error btn-sm normal-case" 
+                                        onclick="return confirm('Delete id = {{ $micropost->id }} ?')">Delete</button>
+                                </form>
                             </div>
+                            {{-- 投稿編集ページへのリンク --}}
+                            <div>
+                                <a href="{{ route('microposts.edit', $micropost->id) }}" class="btn btn-success normal-case">edit</a>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </li>
